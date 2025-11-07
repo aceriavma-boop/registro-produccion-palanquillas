@@ -61,9 +61,12 @@
   </form>
 
   <script>
-    // Cargar fecha actual
+    // Cargar fecha actual en hora local
     const hoy = new Date();
-    document.getElementById("fecha").value = hoy.toISOString().split("T")[0];
+    const fechaLocal = hoy.getFullYear() + "-" +
+      String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
+      String(hoy.getDate()).padStart(2, "0");
+    document.getElementById("fecha").value = fechaLocal;
 
     // Advertencia si es entre 00:00 y 06:00
     const horaActual = hoy.getHours();
@@ -111,7 +114,7 @@
 
         if (data.includes("✅")) {
           document.getElementById("registroForm").reset();
-          document.getElementById("fecha").value = new Date().toISOString().split("T")[0];
+          document.getElementById("fecha").value = fechaLocal;
         }
       })
       .catch(error => {
