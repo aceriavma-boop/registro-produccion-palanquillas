@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Producción de Palanquillas</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 10px; }
+    input, select { width: 100%; padding: 8px; margin-top: 5px; }
+    .readonly { background-color: #f0f0f0; }
+    .alerta { color: red; font-weight: bold; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Registro de Producción de Palanquillas</h2>
+  <div id="alertaTurno" class="alerta"></div>
+
+  <form id="registroForm">
+    <label>Fecha</label>
+    <input type="date" id="fecha" name="fecha" required>
+
+    <label>Turno</label>
+    <select name="turno" required>
+      <option value="">Seleccionar</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+    </select>
+
+    <label>N° Tundish</label>
+    <input type="number" name="tundish" required>
+
+    <label>N° Secuencia Tundish</label>
+    <input type="number" name="secuencia" required>
+
+    <label>N° Colada</label>
+    <input type="text" name="colada" required>
+
+    <label>L1 (UN)</label>
+    <input type="number" id="l1un" name="l1un" required>
+
+    <label>L1 (M)</label>
+    <input type="number" id="l1m" name="l1m" step="any" required>
+
+    <label>L2 (UN)</label>
+    <input type="number" id="l2un" name="l2un" required>
+
+    <label>L2 (M)</label>
+    <input type="number" id="l2m" name="l2m" step="any" required>
+
+    <label>QT. PIEZAS (UN)</label>
+    <input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly">
+
+    <label>Producción (T)</label>
+    <input type="number" id="produccion" name="produccion" readonly class="readonly">
+
+    <label>Causa pérdida de secuencia</label>
+    <input type="text" name="causa">
+
+    <button type="submit">Registrar</button>
+  </form>
+
+  <script>
+    // Cargar fecha actual
+    const hoy = new Date();
+    document.getElementById("fecha").value = hoy.toISOString().split("T")[0];
+
+    // Advertencia si es entre 00:00 y 06:00
+    const horaActual = hoy.getHours();
+    if (horaActual >= 0 && horaActual < 6) {
+      document.getElementById("alertaTurno").textContent =
+        "⚠️ Atención: estás registrando entre las 00:00 y las 06:00. Verificá que la fecha corresponda al día de producción real.";
+    }
+
+    // Función para normalizar coma/punto
+    function normalizar(valor) {
+      return parseFloat(valor.replace(",", ".")) || 0;
+    }
+
+    // Cálculo automático
+    function calcular() {
+      const l1un = normalizar(document.getElementById("l1un").value);
+      const l1m = normalizar(document.getElementById("l1m").value);
+      const l2un = normalizar(document.getElementById("l2un").value);
+      const l2m = normalizar(document.getElementById("l2m").value);
+
+      const qtPiezas = l1un + l2un;
+      const produccion = ((l1un * l1m) + (l2un * l2m)) * 0.075;
+
+      document.getElementById("qtPiezas").value = qtPiezas.toFixed(0);
+      document.getElementById("produccion").value = produccion.toFixed(2);
+    }
+
+    ["l1un", "l1m", "l2un", "l2m"].forEach(id => {
+      document.getElementById(id).addEventListener("input", calcular);
+    });
+
+    // Enviar datos al Web App
+    document.getElementById("registroForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const formData = new FormData(document.getElementById("registroForm"));
+
+      fetch("https://script.google.com/macros/s/AKfycby6_Yy4Xd0gkVwo9hJKs4QFmUzdg_lQIn_LrY-O3nYgY79LQzi_TN5RVDP-pdctKEf1/exec", {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.text())
+      .then(data => {
+        alert(data); // Muestra el mensaje real del backend
+
+        if (data.includes("✅")) {
+          document.getElementById("registroForm").reset();
+          document.getElementById("fecha").value = new Date().toISOString().split("T")[0];
+        }
+      })
+      .catch(error => {
+        alert("❌ Error al registrar: " + error);
+      });
+    });
+  </script>
+</body>
+</html>
