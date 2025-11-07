@@ -62,18 +62,24 @@
 
   <script>
     // Cargar fecha actual en hora local
-    const hoy = new Date();
-    const fechaLocal = hoy.getFullYear() + "-" +
-      String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
-      String(hoy.getDate()).padStart(2, "0");
-    document.getElementById("fecha").value = fechaLocal;
+    function cargarFechaLocal() {
+      const hoy = new Date();
+      const fechaLocal = hoy.getFullYear() + "-" +
+        String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
+        String(hoy.getDate()).padStart(2, "0");
+      document.getElementById("fecha").value = fechaLocal;
 
-    // Advertencia si es entre 00:00 y 06:00
-    const horaActual = hoy.getHours();
-    if (horaActual >= 0 && horaActual < 6) {
-      document.getElementById("alertaTurno").textContent =
-        "⚠️ Atención: estás registrando entre las 00:00 y las 06:00. Verificá que la fecha corresponda al día de producción real.";
+      // Advertencia si es entre 00:00 y 06:00
+      const horaActual = hoy.getHours();
+      if (horaActual >= 0 && horaActual < 6) {
+        document.getElementById("alertaTurno").textContent =
+          "⚠️ Atención: estás registrando entre las 00:00 y las 06:00. Verificá que la fecha corresponda al día de producción real.";
+      } else {
+        document.getElementById("alertaTurno").textContent = "";
+      }
     }
+
+    cargarFechaLocal();
 
     // Función para normalizar coma/punto
     function normalizar(valor) {
@@ -114,7 +120,7 @@
 
         if (data.includes("✅")) {
           document.getElementById("registroForm").reset();
-          document.getElementById("fecha").value = fechaLocal;
+          cargarFechaLocal(); // Recarga la fecha correctamente
         }
       })
       .catch(error => {
