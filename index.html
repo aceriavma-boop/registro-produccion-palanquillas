@@ -57,12 +57,19 @@
     <label>Causa pérdida de secuencia</label>
     <input type="text" name="causa">
 
-    <!-- 🔹 Nuevos campos -->
+    <!-- 🔹 Nuevo campo obligatorio con lista desplegable -->
+    <label>Delay</label>
+    <select id="delay" name="delay" required>
+      <option value="">Seleccionar</option>
+      <option value="SI">Sí</option>
+      <option value="NO">No</option>
+    </select>
+
     <label>Tipo</label>
-    <input type="text" name="tipo">
+    <input type="text" name="tipo" required>
 
     <label>Tiempo de parada</label>
-    <input type="text" name="tiempoParada">
+    <input type="text" id="tiempoParada" name="tiempoParada" required>
 
     <button type="submit">Registrar</button>
   </form>
@@ -109,6 +116,19 @@
 
     ["l1un", "l1m", "l2un", "l2m"].forEach(id => {
       document.getElementById(id).addEventListener("input", calcular);
+    });
+
+    // 🔹 Habilitar/deshabilitar Tiempo de parada según Delay
+    document.getElementById("delay").addEventListener("change", function() {
+      const tiempoParada = document.getElementById("tiempoParada");
+      if (this.value === "NO") {
+        tiempoParada.value = "";
+        tiempoParada.disabled = true;
+        tiempoParada.removeAttribute("required");
+      } else {
+        tiempoParada.disabled = false;
+        tiempoParada.setAttribute("required", "true");
+      }
     });
 
     // Enviar datos al Web App
