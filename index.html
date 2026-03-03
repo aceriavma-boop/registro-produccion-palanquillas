@@ -2,158 +2,259 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro de Producción de Palanquillas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Producción de Palanquillas</title>
   <style>
-    body { font-family: Arial, sans-serif; padding: 20px; max-width: 600px; margin: auto; }
-    label { display: block; margin-top: 10px; }
-    input, select { width: 100%; padding: 8px; margin-top: 5px; }
-    .readonly { background-color: #f0f0f0; }
-    .alerta { color: red; font-weight: bold; margin-top: 10px; }
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+    }
+
+    body { 
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+      background-color: var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 15px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container { width: 100%; max-width: 500px; }
+    h2 { text-align: center; color: #0f172a; margin-bottom: 20px; font-weight: 700; }
+
+    .card {
+      background: var(--card);
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 15px;
+      border: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      margin-bottom: 15px;
+      border-bottom: 2px solid #eff6ff;
+      padding-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .full-width { grid-column: span 2; }
+
+    label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #64748b; }
+
+    input, select, textarea { 
+      width: 100%; 
+      padding: 12px; 
+      box-sizing: border-box; 
+      border: 1.5px solid var(--border); 
+      border-radius: 8px; 
+      font-size: 16px; 
+      transition: border-color 0.2s;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
+    .readonly { background-color: #f1f5f9; color: #475569; font-weight: bold; border-style: dashed; }
+
+    .alerta { 
+      background-color: #fef2f2; 
+      color: #991b1b; 
+      padding: 10px; 
+      border-radius: 8px; 
+      font-size: 0.85rem; 
+      margin-bottom: 15px; 
+      border-left: 4px solid #ef4444;
+      display: none; 
+    }
+
+    button { 
+      width: 100%; 
+      padding: 16px; 
+      background-color: var(--primary); 
+      color: white; 
+      border: none; 
+      border-radius: 12px; 
+      font-size: 18px; 
+      font-weight: bold;
+      cursor: pointer; 
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3);
+    }
+
+    button:disabled { background-color: #cbd5e1; box-shadow: none; }
   </style>
 </head>
 <body>
-  <h2>Registro de Producción de Palanquillas</h2>
+
+<div class="container">
+  <h2>Registro de Coladas</h2>
   <div id="alertaTurno" class="alerta"></div>
 
   <form id="registroForm">
-    <label>Fecha</label>
-    <input type="date" id="fecha" name="fecha" required>
+    
+    <div class="card">
+      <div class="section-title">Información General</div>
+      <div class="grid">
+        <div>
+          <label>Fecha</label>
+          <input type="date" id="fecha" name="fecha" required>
+        </div>
+        <div>
+          <label>Turno</label>
+          <select name="turno" required>
+            <option value="">...</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
+        </div>
+        <div class="full-width">
+          <label>Supervisor</label>
+          <select name="supervisor" required>
+            <option value="">Seleccionar responsable</option>
+            <option value="Braulio Gimenez">Braulio Gimenez</option>
+            <option value="Derlis Santacruz">Derlis Santacruz</option>
+            <option value="Kevin Lezcano">Kevin Lezcano</option>
+            <option value="Rodrigo Farrugio">Rodrigo Farrugio</option>
+          </select>
+        </div>
+      </div>
+    </div>
 
-    <label>Turno</label>
-    <select name="turno" required>
-      <option value="">Seleccionar</option>
-      <option value="A">A</option>
-      <option value="B">B</option>
-      <option value="C">C</option>
-    </select>
+    <div class="card">
+      <div class="section-title">Proceso y Colada</div>
+      <div class="grid">
+        <div><label>H. Apertura</label><input type="time" name="horaApertura" required></div>
+        <div><label>H. Cierre</label><input type="time" name="horaCierre" required></div>
+        <div><label>N° Tundish</label><input type="number" name="tundish" required></div>
+        <div><label>Secuencia</label><input type="number" name="secuencia" required></div>
+        <div class="full-width"><label>N° Colada</label><input type="text" name="colada" required></div>
+      </div>
+    </div>
 
-    <label>N° Tundish</label>
-    <input type="number" name="tundish" required>
+    <div class="card">
+      <div class="section-title">Producción (Líneas)</div>
+      <div class="grid">
+        <div>
+          <label>L1 (UN)</label><input type="number" id="l1un" name="l1un" required>
+          <label>L1 (M)</label><input type="number" id="l1m" name="l1m" step="any" required>
+        </div>
+        <div>
+          <label>L2 (UN)</label><input type="number" id="l2un" name="l2un" required>
+          <label>L2 (M)</label><input type="number" id="l2m" name="l2m" step="any" required>
+        </div>
+        <div class="full-width" style="margin-top: 10px; padding-top: 10px; border-top: 2px solid #f8fafc;">
+          <div class="grid">
+            <div><label>QT. PIEZAS (UN)</label><input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly"></div>
+            <div><label>PRODUCCIÓN (T)</label><input type="number" id="produccion" name="produccion" readonly class="readonly"></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-    <label>N° Secuencia Tundish</label>
-    <input type="number" name="secuencia" required>
+    <div class="card">
+      <div class="section-title">Retrasos y Paradas CCM</div>
+      <div class="grid">
+        <div>
+          <label>Delay</label>
+          <select id="delay" name="delay" required>
+            <option value="NO">No</option>
+            <option value="SI">Sí</option>
+          </select>
+        </div>
+        <div>
+          <label>Tipo</label>
+          <select id="tipoParada" name="tipo" disabled>
+            <option value="">Seleccionar</option>
+            <option value="OPERACIONAL">Operacional</option>
+            <option value="MANTENIMIENTO">Mantenimiento</option>
+          </select>
+        </div>
+        <div class="full-width">
+          <label>Tiempo de parada CCM (min)</label>
+          <input type="number" id="tiempoParada" name="tiempoParada" placeholder="Ej: 15" disabled>
+        </div>
+        <div class="full-width">
+          <label>Descripción / Causa (Especif. si es Eléctrico, etc.)</label>
+          <textarea name="causa" rows="2" placeholder="Detallar causa (Ej: Eléctrico - Falla en sensor de nivel)"></textarea>
+        </div>
+      </div>
+    </div>
 
-    <label>N° Colada</label>
-    <input type="text" name="colada" required>
-
-    <label>L1 (UN)</label>
-    <input type="number" id="l1un" name="l1un" required>
-
-    <label>L1 (M)</label>
-    <input type="number" id="l1m" name="l1m" step="any" required>
-
-    <label>L2 (UN)</label>
-    <input type="number" id="l2un" name="l2un" required>
-
-    <label>L2 (M)</label>
-    <input type="number" id="l2m" name="l2m" step="any" required>
-
-    <label>QT. PIEZAS (UN)</label>
-    <input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly">
-
-    <label>Producción (T)</label>
-    <input type="number" id="produccion" name="produccion" readonly class="readonly">
-
-    <label>Causa pérdida de secuencia</label>
-    <input type="text" name="causa">
-
-    <!-- 🔹 Nuevo campo obligatorio con lista desplegable -->
-    <label>Delay</label>
-    <select id="delay" name="delay" required>
-      <option value="">Seleccionar</option>
-      <option value="SI">Sí</option>
-      <option value="NO">No</option>
-    </select>
-
-    <label>Tipo</label>
-    <input type="text" name="tipo" required>
-
-    <label>Tiempo de parada</label>
-    <input type="text" id="tiempoParada" name="tiempoParada" required>
-
-    <button type="submit">Registrar</button>
+    <button type="submit" id="btnRegistrar">Registrar Producción</button>
   </form>
+</div>
 
-  <script>
-    // Cargar fecha actual en hora local
-    function cargarFechaLocal() {
-      const hoy = new Date();
-      const fechaLocal = hoy.getFullYear() + "-" +
-        String(hoy.getMonth() + 1).padStart(2, "0") + "-" +
-        String(hoy.getDate()).padStart(2, "0");
-      document.getElementById("fecha").value = fechaLocal;
+<script>
+  function cargarFechaLocal() {
+    const hoy = new Date();
+    const fechaLocal = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0") + "-" + String(hoy.getDate()).padStart(2, "0");
+    document.getElementById("fecha").value = fechaLocal;
 
-      // Advertencia si es entre 00:00 y 06:00
-      const horaActual = hoy.getHours();
-      if (horaActual >= 0 && horaActual < 6) {
-        document.getElementById("alertaTurno").textContent =
-          "⚠️ Atención: estás registrando entre las 00:00 y las 06:00. Verificá que la fecha corresponda al día de producción real.";
-      } else {
-        document.getElementById("alertaTurno").textContent = "";
+    const horaActual = hoy.getHours();
+    const alerta = document.getElementById("alertaTurno");
+    if (horaActual >= 0 && horaActual < 6) {
+      alerta.style.display = "block";
+      alerta.textContent = "⚠️ Estás registrando de madrugada. Verifica la fecha de producción.";
+    } else {
+      alerta.style.display = "none";
+    }
+  }
+
+  cargarFechaLocal();
+
+  function normalizar(v) { return parseFloat(v.toString().replace(",", ".")) || 0; }
+
+  function calcular() {
+    const l1un = normalizar(document.getElementById("l1un").value);
+    const l1m = normalizar(document.getElementById("l1m").value);
+    const l2un = normalizar(document.getElementById("l2un").value);
+    const l2m = normalizar(document.getElementById("l2m").value);
+
+    document.getElementById("qtPiezas").value = (l1un + l2un).toFixed(0);
+    document.getElementById("produccion").value = (((l1un * l1m) + (l2un * l2m)) * 0.075).toFixed(2);
+  }
+
+  ["l1un", "l1m", "l2un", "l2m"].forEach(id => document.getElementById(id).addEventListener("input", calcular));
+
+  document.getElementById("delay").addEventListener("change", function() {
+    const t = document.getElementById("tiempoParada"), tp = document.getElementById("tipoParada");
+    if (this.value === "NO") {
+      t.value = ""; t.disabled = true; tp.value = ""; tp.disabled = true;
+    } else {
+      t.disabled = false; tp.disabled = false;
+    }
+  });
+
+  document.getElementById("registroForm").addEventListener("submit", function(e) {
+    e.preventDefault();
+    const btn = document.getElementById("btnRegistrar");
+    btn.disabled = true; btn.innerText = "Enviando...";
+
+    fetch("https://script.google.com/macros/s/AKfycby6_Yy4Xd0gkVwo9hJKs4QFmUzdg_lQIn_LrY-O3nYgY79LQzi_TN5RVDP-pdctKEf1/exec", {
+      method: "POST",
+      body: new FormData(this)
+    })
+    .then(r => r.text())
+    .then(data => {
+      alert(data);
+      if (data.includes("✅")) { 
+        this.reset(); cargarFechaLocal();
+        document.getElementById("tiempoParada").disabled = true;
+        document.getElementById("tipoParada").disabled = true;
       }
-    }
-
-    cargarFechaLocal();
-
-    // Función para normalizar coma/punto
-    function normalizar(valor) {
-      return parseFloat(valor.replace(",", ".")) || 0;
-    }
-
-    // Cálculo automático
-    function calcular() {
-      const l1un = normalizar(document.getElementById("l1un").value);
-      const l1m = normalizar(document.getElementById("l1m").value);
-      const l2un = normalizar(document.getElementById("l2un").value);
-      const l2m = normalizar(document.getElementById("l2m").value);
-
-      const qtPiezas = l1un + l2un;
-      const produccion = ((l1un * l1m) + (l2un * l2m)) * 0.075;
-
-      document.getElementById("qtPiezas").value = qtPiezas.toFixed(0);
-      document.getElementById("produccion").value = produccion.toFixed(2);
-    }
-
-    ["l1un", "l1m", "l2un", "l2m"].forEach(id => {
-      document.getElementById(id).addEventListener("input", calcular);
-    });
-
-    // 🔹 Habilitar/deshabilitar Tiempo de parada según Delay
-    document.getElementById("delay").addEventListener("change", function() {
-      const tiempoParada = document.getElementById("tiempoParada");
-      if (this.value === "NO") {
-        tiempoParada.value = "";
-        tiempoParada.disabled = true;
-        tiempoParada.removeAttribute("required");
-      } else {
-        tiempoParada.disabled = false;
-        tiempoParada.setAttribute("required", "true");
-      }
-    });
-
-    // Enviar datos al Web App
-    document.getElementById("registroForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const formData = new FormData(document.getElementById("registroForm"));
-
-      fetch("https://script.google.com/macros/s/AKfycby6_Yy4Xd0gkVwo9hJKs4QFmUzdg_lQIn_LrY-O3nYgY79LQzi_TN5RVDP-pdctKEf1/exec", {
-        method: "POST",
-        body: formData
-      })
-      .then(response => response.text())
-      .then(data => {
-        alert(data); // Muestra el mensaje real del backend
-
-        if (data.includes("✅")) {
-          document.getElementById("registroForm").reset();
-          cargarFechaLocal(); // Recarga la fecha correctamente
-        }
-      })
-      .catch(error => {
-        alert("❌ Error al registrar: " + error);
-      });
-    });
-  </script>
+    })
+    .catch(err => alert("❌ Error: " + err))
+    .finally(() => { btn.disabled = false; btn.innerText = "Registrar Producción"; });
+  });
+</script>
 </body>
 </html>
