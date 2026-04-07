@@ -17,7 +17,8 @@
     input, select, textarea { width: 100%; padding: 12px; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; font-size: 16px; transition: border-color 0.2s; font-family: inherit; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
     .readonly { background-color: #f1f5f9; color: #475569; font-weight: bold; border-style: dashed; }
-    /* Estilo para el campo de porcentaje */
+    
+    /* Contenedor para el símbolo de porcentaje */
     .perc-container { position: relative; }
     .perc-container::after { content: "%"; position: absolute; right: 12px; top: 35px; color: #64748b; font-weight: bold; }
     
@@ -82,7 +83,8 @@
         <div><label>QT. PIEZAS</label><input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly"></div>
         <div><label>PROD. (T)</label><input type="number" id="produccion" name="produccion" readonly class="readonly"></div>
         
-        <div><label>Carga Metálica (T)</label><input type="number" id="carga" step="any"></div>
+        <div><label>Carga Metálica (T)</label><input type="number" id="carga" name="carga" step="any"></div>
+        
         <div class="perc-container">
           <label>Rendimiento</label>
           <input type="number" id="rendimiento" name="rendimiento" readonly class="readonly">
@@ -131,6 +133,7 @@
 </div>
 
 <script>
+  // Inicialización de fecha local
   function cargarFechaLocal() {
     const hoy = new Date();
     const fechaLocal = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0") + "-" + String(hoy.getDate()).padStart(2, "0");
@@ -148,6 +151,7 @@
   
   cargarFechaLocal();
 
+  // Función de cálculo en tiempo real
   function calcular() {
     const l1un = parseFloat(document.getElementById("l1un").value) || 0;
     const l1m = parseFloat(document.getElementById("l1m").value) || 0;
@@ -155,13 +159,14 @@
     const l2m = parseFloat(document.getElementById("l2m").value) || 0;
     const cargaVal = parseFloat(document.getElementById("carga").value) || 0;
 
+    // Producción teórica factor 0.075
     const prodT = ((l1un * l1m) + (l2un * l2m)) * 0.075;
     
     document.getElementById("qtPiezas").value = (l1un + l2un).toFixed(0);
     document.getElementById("produccion").value = prodT.toFixed(2);
 
+    // Rendimiento con 1 decimal
     if (cargaVal > 0) {
-      // Calculamos con 1 decimal para el rendimiento
       const rend = (prodT / cargaVal) * 100;
       document.getElementById("rendimiento").value = rend.toFixed(1);
     } else {
@@ -169,10 +174,12 @@
     }
   }
 
+  // Escuchar cambios en los inputs
   ["l1un", "l1m", "l2un", "l2m", "carga"].forEach(id => {
     document.getElementById(id).addEventListener("input", calcular);
   });
 
+  // Habilitar/Deshabilitar campos según el Delay
   document.getElementById("delay").addEventListener("change", function() {
     const isSi = this.value === "SI";
     document.getElementById("tiempoParada").disabled = !isSi;
@@ -184,6 +191,7 @@
     }
   });
 
+  // Envío de formulario
   document.getElementById("registroForm").addEventListener("submit", function(e) {
     e.preventDefault();
     const btn = document.getElementById("btnRegistrar");
@@ -201,6 +209,7 @@
       if (data.includes("✅")) { 
         this.reset(); 
         cargarFechaLocal();
+        // Limpiar campos readonly manualmente
         document.getElementById("qtPiezas").value = "";
         document.getElementById("produccion").value = "";
         document.getElementById("rendimiento").value = "";
