@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Producción de Palanquillas</title>
+  <title>Producción de Palanquillas - Acería</title>
   <style>
     :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; --text: #1e293b; --border: #e2e8f0; }
     body { font-family: 'Segoe UI', sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 15px; display: flex; justify-content: center; }
@@ -17,6 +17,10 @@
     input, select, textarea { width: 100%; padding: 12px; box-sizing: border-box; border: 1.5px solid var(--border); border-radius: 8px; font-size: 16px; transition: border-color 0.2s; font-family: inherit; }
     input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); }
     .readonly { background-color: #f1f5f9; color: #475569; font-weight: bold; border-style: dashed; }
+    /* Estilo para el campo de porcentaje */
+    .perc-container { position: relative; }
+    .perc-container::after { content: "%"; position: absolute; right: 12px; top: 35px; color: #64748b; font-weight: bold; }
+    
     .alerta { background-color: #fef2f2; color: #991b1b; padding: 10px; border-radius: 8px; font-size: 0.85rem; margin-bottom: 15px; border-left: 4px solid #ef4444; display: none; }
     button { width: 100%; padding: 16px; background-color: var(--primary); color: white; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.3); }
     button:disabled { background-color: #cbd5e1; box-shadow: none; }
@@ -35,7 +39,12 @@
         <div><label>Fecha</label><input type="date" id="fecha" name="fecha" required></div>
         <div>
           <label>Turno</label>
-          <select name="turno" required><option value="">...</option><option value="A">A</option><option value="B">B</option><option value="C">C</option></select>
+          <select name="turno" required>
+            <option value="">...</option>
+            <option value="A">A</option>
+            <option value="B">B</option>
+            <option value="C">C</option>
+          </select>
         </div>
         <div class="full-width">
           <label>Supervisor</label>
@@ -63,17 +72,20 @@
     </div>
 
     <div class="card">
-      <div class="section-title">Producción (Líneas)</div>
+      <div class="section-title">Producción y Rendimiento</div>
       <div class="grid">
         <div><label>L1 (UN)</label><input type="number" id="l1un" name="l1un" required></div>
         <div><label>L1 (M)</label><input type="number" id="l1m" name="l1m" step="any" required></div>
         <div><label>L2 (UN)</label><input type="number" id="l2un" name="l2un" required></div>
         <div><label>L2 (M)</label><input type="number" id="l2m" name="l2m" step="any" required></div>
-        <div class="full-width">
-          <div class="grid">
-            <div><label>QT. PIEZAS</label><input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly"></div>
-            <div><label>PROD. (T)</label><input type="number" id="produccion" name="produccion" readonly class="readonly"></div>
-          </div>
+        
+        <div><label>QT. PIEZAS</label><input type="number" id="qtPiezas" name="qtPiezas" readonly class="readonly"></div>
+        <div><label>PROD. (T)</label><input type="number" id="produccion" name="produccion" readonly class="readonly"></div>
+        
+        <div><label>Carga Metálica (T)</label><input type="number" id="carga" step="any"></div>
+        <div class="perc-container">
+          <label>Rendimiento</label>
+          <input type="number" id="rendimiento" name="rendimiento" readonly class="readonly">
         </div>
       </div>
     </div>
@@ -90,7 +102,7 @@
         </div>
         <div>
           <label>Horno Corte</label>
-          <select id="hornoCorte" name="hornoCorte">
+          <select id="hornoCorte" name="hornoCorte" disabled>
             <option value="N/A">N/A</option>
             <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
           </select>
@@ -105,11 +117,11 @@
         </div>
         <div>
           <label>Tiempo Parada (min)</label>
-          <input type="number" id="tiempoParada" name="tiempoParada" placeholder="Ej: 15" disabled>
+          <input type="number" id="tiempoParada" name="tiempoParada" disabled>
         </div>
         <div class="full-width">
           <label>Descripción / Causa</label>
-          <textarea name="causa" rows="2" placeholder="Detallar causa..."></textarea>
+          <textarea name="causa" rows="2"></textarea>
         </div>
       </div>
     </div>
@@ -123,10 +135,17 @@
     const hoy = new Date();
     const fechaLocal = hoy.getFullYear() + "-" + String(hoy.getMonth() + 1).padStart(2, "0") + "-" + String(hoy.getDate()).padStart(2, "0");
     document.getElementById("fecha").value = fechaLocal;
+    
     const horaActual = hoy.getHours();
     const alerta = document.getElementById("alertaTurno");
-    if (horaActual >= 0 && horaActual < 6) { alerta.style.display = "block"; alerta.textContent = "⚠️ Estás registrando de madrugada. Verifica la fecha."; } else { alerta.style.display = "none"; }
+    if (horaActual >= 0 && horaActual < 6) { 
+      alerta.style.display = "block"; 
+      alerta.textContent = "⚠️ Registro de madrugada. Verifica la fecha."; 
+    } else { 
+      alerta.style.display = "none"; 
+    }
   }
+  
   cargarFechaLocal();
 
   function calcular() {
@@ -134,31 +153,64 @@
     const l1m = parseFloat(document.getElementById("l1m").value) || 0;
     const l2un = parseFloat(document.getElementById("l2un").value) || 0;
     const l2m = parseFloat(document.getElementById("l2m").value) || 0;
+    const cargaVal = parseFloat(document.getElementById("carga").value) || 0;
+
+    const prodT = ((l1un * l1m) + (l2un * l2m)) * 0.075;
+    
     document.getElementById("qtPiezas").value = (l1un + l2un).toFixed(0);
-    document.getElementById("produccion").value = (((l1un * l1m) + (l2un * l2m)) * 0.075).toFixed(2);
+    document.getElementById("produccion").value = prodT.toFixed(2);
+
+    if (cargaVal > 0) {
+      // Calculamos con 1 decimal para el rendimiento
+      const rend = (prodT / cargaVal) * 100;
+      document.getElementById("rendimiento").value = rend.toFixed(1);
+    } else {
+      document.getElementById("rendimiento").value = "";
+    }
   }
-  ["l1un", "l1m", "l2un", "l2m"].forEach(id => document.getElementById(id).addEventListener("input", calcular));
+
+  ["l1un", "l1m", "l2un", "l2m", "carga"].forEach(id => {
+    document.getElementById(id).addEventListener("input", calcular);
+  });
 
   document.getElementById("delay").addEventListener("change", function() {
     const isSi = this.value === "SI";
     document.getElementById("tiempoParada").disabled = !isSi;
     document.getElementById("tipoParada").disabled = !isSi;
     document.getElementById("hornoCorte").disabled = !isSi;
-    if(!isSi) { document.getElementById("hornoCorte").value = "N/A"; document.getElementById("tiempoParada").value = ""; }
+    if(!isSi) { 
+      document.getElementById("hornoCorte").value = "N/A"; 
+      document.getElementById("tiempoParada").value = ""; 
+    }
   });
 
   document.getElementById("registroForm").addEventListener("submit", function(e) {
     e.preventDefault();
     const btn = document.getElementById("btnRegistrar");
     btn.disabled = true; btn.innerText = "Enviando...";
-    fetch("https://script.google.com/macros/s/AKfycby6_Yy4Xd0gkVwo9hJKs4QFmUzdg_lQIn_LrY-O3nYgY79LQzi_TN5RVDP-pdctKEf1/exec", {
+    
+    const url = "https://script.google.com/macros/s/AKfycby6_Yy4Xd0gkVwo9hJKs4QFmUzdg_lQIn_LrY-O3nYgY79LQzi_TN5RVDP-pdctKEf1/exec";
+    
+    fetch(url, {
       method: "POST",
       body: new FormData(this)
     })
     .then(r => r.text())
-    .then(data => { alert(data); if (data.includes("✅")) { this.reset(); cargarFechaLocal(); } })
+    .then(data => { 
+      alert(data); 
+      if (data.includes("✅")) { 
+        this.reset(); 
+        cargarFechaLocal();
+        document.getElementById("qtPiezas").value = "";
+        document.getElementById("produccion").value = "";
+        document.getElementById("rendimiento").value = "";
+      } 
+    })
     .catch(err => alert("❌ Error: " + err))
-    .finally(() => { btn.disabled = false; btn.innerText = "Registrar Producción"; });
+    .finally(() => { 
+      btn.disabled = false; 
+      btn.innerText = "Registrar Producción"; 
+    });
   });
 </script>
 </body>
